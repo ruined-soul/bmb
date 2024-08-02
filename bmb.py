@@ -1,12 +1,23 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 import time
+import asyncio
 
 TOKEN = '7322708595:AAExdf_Swh65yIOvHHbBRXrJXGJb15N1mSY'
 DEVELOPER_CONTACT = 'Ruined_soul'
 
 # Track the bot's start time
 start_time = time.time()
+
+# Command details
+HELP_TEXT = """
+Here are the commands you can use:
+
+/start - Get a welcome message and instructions.
+/all - Tag all users in the group.
+/admin - Tag all admins in the group.
+/alive - Check the bot's uptime.
+"""
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.chat.type == 'private':
@@ -49,6 +60,16 @@ async def alive_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     
     await update.message.reply_text(f"Bot is alive! Uptime: {uptime_str}")
 
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message.chat.type == 'private':
+        await update.message.reply_text(HELP_TEXT)
+    else:
+        keyboard = [
+            [InlineKeyboardButton("Get help via PM", url=f"https://t.me/{context.bot.username}?start=help")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("For help, please send me a private message using the button below.", reply_markup=reply_markup)
+
 async def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
@@ -56,9 +77,12 @@ async def main() -> None:
     application.add_handler(CommandHandler("all", all_command))
     application.add_handler(CommandHandler("admin", admin_command))
     application.add_handler(CommandHandler("alive", alive_command))
+    application.add_handler(CommandHandler("help", help_command))
 
+    # Run the application
     await application.run_polling()
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    # Use the current event loop to run the main function
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
