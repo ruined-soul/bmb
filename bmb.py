@@ -1,13 +1,13 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
-TOKEN = 'YOUR_BOT_TOKEN'
-DEVELOPER_CONTACT = 'YOUR_CONTACT_USERNAME'
+TOKEN = '7322708595:AAExdf_Swh65yIOvHHbBRXrJXGJb15N1mSY'
+DEVELOPER_CONTACT = 'Ruined_soul'
 
 def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
         [InlineKeyboardButton("Add me to your group", url=f"https://t.me/{context.bot.username}?startgroup=true")],
-        [InlineKeyboardButton("Contact Developer", url=f"https://t.me/{DEVELOPER_CONTACT}")]
+        [InlineKeyboardButton("Contact Developer", url=f"https://t.me/Ruined_soul")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text('Welcome! Use /all to tag all users and /admin to tag all admins.', reply_markup=reply_markup)
