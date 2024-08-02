@@ -1,45 +1,45 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.helpers import escape_markdown
 
 TOKEN = '7322708595:AAExdf_Swh65yIOvHHbBRXrJXGJb15N1mSY'
 DEVELOPER_CONTACT = 'Ruined_soul'
 
-def start(update: Update, context: CallbackContext) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Add me to your group", url=f"https://t.me/{context.bot.username}?startgroup=true")],
-        [InlineKeyboardButton("Contact Developer", url=f"https://t.me/Ruined_soul")]
+        [InlineKeyboardButton("Contact Developer", url=f"https://t.me/{DEVELOPER_CONTACT}")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('Welcome! Use /all to tag all users and /admin to tag all admins.', reply_markup=reply_markup)
+    await update.message.reply_text('Welcome! Use /all to tag all users and /admin to tag all admins.', reply_markup=reply_markup)
 
-def all_command(update: Update, context: CallbackContext) -> None:
+async def all_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat = update.message.chat
-    members = chat.get_members()
+    members = await chat.get_members()  # Note: This line assumes you have a method to get members, which might not exist.
     tags = [f'@{member.user.username}' for member in members if member.user.username]
     if tags:
-        update.message.reply_text(' '.join(tags))
+        await update.message.reply_text(' '.join(tags))
     else:
-        update.message.reply_text("No users to tag.")
+        await update.message.reply_text("No users to tag.")
 
-def admin_command(update: Update, context: CallbackContext) -> None:
+async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat = update.message.chat
-    admins = chat.get_administrators()
+    admins = await chat.get_administrators()  # Note: This line assumes you have a method to get admins.
     tags = [f'@{admin.user.username}' for admin in admins if admin.user.username]
     if tags:
-        update.message.reply_text(' '.join(tags))
+        await update.message.reply_text(' '.join(tags))
     else:
-        update.message.reply_text("No admins to tag.")
+        await update.message.reply_text("No admins to tag.")
 
-def main() -> None:
-    updater = Updater(TOKEN)
-    dispatcher = updater.dispatcher
+async def main() -> None:
+    application = Application.builder().token(TOKEN).build()
 
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("all", all_command))
-    dispatcher.add_handler(CommandHandler("admin", admin_command))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("all", all_command))
+    application.add_handler(CommandHandler("admin", admin_command))
 
-    updater.start_polling()
-    updater.idle()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
